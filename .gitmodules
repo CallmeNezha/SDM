@@ -1,0 +1,3 @@
+[submodule "thirdparty/superviseddescent"]
+	path = thirdparty/superviseddescent
+	url = git@github.com:patrikhuber/superviseddescent.git
