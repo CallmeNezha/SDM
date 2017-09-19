@@ -22,7 +22,7 @@ set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/arch" )
 # set relative path
 set( SDM_DIR "${ROOT_DIR}/SDM" CACHE PATH "SDM directory." )
 set( DOC_DIR "${ROOT_DIR}/doc" CACHE PATH "Document directory Doxygen." )
-set( CEREAL_INCLUDE_DIR "${THIRDPATY_DIR}/cereal-1.1.1/include" CACHE PATH "cereal-1.1.1 directory." )
+set( SUPERVISEDDESCENT_DIR "${THIRDPATY_DIR}/superviseddescent/include" CACHE PATH "superviseddescent directory." )
 
 
 # options
@@ -47,6 +47,14 @@ find_package( Eigen3 REQUIRED )
 message( STATUS "Eigen3 found: ${EIGEN3_FOUND}" ) 
 message( STATUS "Eigen3 include dir found at ${EIGEN3_INCLUDE_DIR}" )
 message( STATUS "Eigen3 version ${EIGEN3_VERSION}" )
+
+find_package( Boost COMPONENTS system filesystem program_options REQUIRED )
+if(Boost_FOUND)
+  message(STATUS "Boost found at ${Boost_INCLUDE_DIRS}")
+else(Boost_FOUND)
+  message(FATAL_ERROR "Boost not found")
+endif()
+
 
 include( cmake/SDM.cmake )
 if( BUILD_DOCUMENT )
