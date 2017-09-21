@@ -1,5 +1,5 @@
 /*
- SDM ::
+ X ::
  
  Copyright 2017 ZiJian Jiang
  
@@ -241,7 +241,6 @@ namespace X
     traceVargs(_filePath, _line, _format, argList);
     va_end(argList);
   }
-  
   
 }
 

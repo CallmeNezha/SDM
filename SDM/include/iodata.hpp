@@ -39,6 +39,9 @@
 #include <cassert>
 
 #include "rcr/landmark.hpp"
+#include "rcr/model.hpp"
+
+#include "xmath.hpp"
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
@@ -124,9 +127,26 @@ namespace SDM
   class HelenIO : public IData
   {
   public:
+    
+    struct EyeId
+    {
+      uint16_t inCorner;
+      uint16_t outCorner;
+    };
+    
     HelenIO(fs::path _imgDir, fs::path _lmkDir)
     {
+      // Landmarks id assign.
+      m_leftEye.outCorner = 144;
+      m_leftEye.inCorner = 134;
       
+      m_rightEye.inCorner = 114;
+      m_rightEye.outCorner = 124;
+      
+      m_innerMouth = X::range<uint16_t>(86, 113);
+      m_outerMouth = X::range<uint16_t>(58, 85);
+      
+      //
       std::map<std::string, rcr::LandmarkCollection<cv::Vec2f>>  landmarks;
       
       // Get all the filenames in the given directory:
@@ -147,17 +167,18 @@ namespace SDM
         }
       }
       
-      // Check correspondency.
-      if (m_filenames.size() != landmarks.size())
-      {
-        throw std::runtime_error("Image file is not corresponding to landmarks file.");
-      }
-      
+
       // Convert map to vector.
       for (uint32_t i = 0; i < m_filenames.size(); ++i)
       {
-        m_landmarks.emplace_back(landmarks[ m_filenames[i].string() ]);
+        auto filename = fs::basename(m_filenames[i].filename());
+        if (landmarks.end() == landmarks.find(filename))
+        {
+          throw std::runtime_error("Landmark file not exists.");
+        }
+        m_landmarks.emplace_back(landmarks[ filename ]);
       }
+    
     }
     
     
@@ -166,7 +187,7 @@ namespace SDM
       if (0 == m_images.size())
       {
         for (auto& file : m_filenames)
-          m_images.emplace_back(cv::imread(file.string()));
+          m_images.emplace_back(cv::imread(file.string() ) );
       }
       return m_images;
     }
@@ -181,10 +202,23 @@ namespace SDM
       return m_filenames;
     }
     
+    const EyeId& getLeftEye()  { return m_leftEye; }
+    const EyeId& getRightEye() { return m_rightEye; }
+    const std::vector<uint16_t>& getInnerMouth() { return m_innerMouth; }
+    const std::vector<uint16_t>& getOuterMouth() { return m_outerMouth; }
+    
   private:
     std::vector<cv::Mat>    m_images;
     std::vector<fs::path>   m_filenames;
     std::vector<rcr::LandmarkCollection<cv::Vec2f>> m_landmarks;
+    
+
+    
+    EyeId                 m_leftEye;
+    EyeId                 m_rightEye;
+    std::vector<uint16_t> m_innerMouth;
+    std::vector<uint16_t> m_outerMouth;
+    
     
   };
 
